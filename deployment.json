@@ -1,0 +1,10 @@
+{
+  "address": "0x982e310De4EF2F509a5fa246CF35e991f0E98271",
+  "deployer": "0xD728ac6e7B34202E474721e649e0b2D311670982",
+  "agent": "0x5344B1534fef1DB2aB806D0D80C8315804A13657",
+  "chainId": 5003,
+  "rpc": "https://rpc.sepolia.mantle.xyz",
+  "explorer": "https://explorer.sepolia.mantle.xyz/address/0x982e310De4EF2F509a5fa246CF35e991f0E98271",
+  "txHash": "25fe25ab0574dcd7912a99160f8b77e95d1de29777b8ac53dfb604b8379559f5",
+  "block": 39912193
+}

@@ -1,0 +1,5 @@
+{
+  "deployer": {"address": "0x...", "pk": "0x... (throwaway testnet key)"},
+  "agent":    {"address": "0x...", "pk": "0x... (AI agent wallet)"},
+  "player":   {"address": "0x...", "pk": "0x... (demo human player)"}
+}
