@@ -131,12 +131,39 @@ async def cmd_cycle(asset="MNT", lock=60, resolve_after=120, wait=True):
 async def cmd_resolve():
     rid = latest()
     r = C.functions.getRound(rid).call()
-    if r[10]:
+    if r[9]:
         print("latest already resolved"); return
     asset = r[0]
     p1 = price_scaled(asset)
     h, st = send(OWNER_PK, C.functions.resolve, rid, p1)
     print("resolved", rid, "end", p1/1e8, "tx", h, st)
+
+
+async def cmd_tick(lock=600, resolve_after=780):
+    """Idempotent keeper step: resolve any due rounds and ensure one live round
+    is always open. Designed to be run on a cron (e.g. every ~10 min)."""
+    now = w3.eth.get_block("latest")["timestamp"]
+    n = latest()
+    live_open = False
+    for i in range(max(1, n - 6), n + 1):
+        r = C.functions.getRound(i).call()
+        resolved = r[9]
+        lock_t, resolve_t = r[4], r[5]
+        # resolve rounds that are past their resolve time and have an AI prediction
+        if not resolved and r[6] != 0 and now >= resolve_t:
+            p1 = price_scaled(r[0])
+            h, st = send(OWNER_PK, C.functions.resolve, i, p1)
+            print(f"[tick] resolved #{i} end={p1/1e8:.6f} tx {h} {st}")
+        # is there a round still open for human predictions?
+        if not resolved and now < lock_t:
+            live_open = True
+    if not live_open:
+        assets = ["MNT", "BTC", "ETH"]
+        asset = assets[now % len(assets)]
+        rid = await cmd_cycle(asset, lock, resolve_after, wait=False)
+        print(f"[tick] opened live round #{rid} ({asset}) lock={lock}s")
+    else:
+        print("[tick] live round already open; nothing to create")
 
 
 def cmd_status():
@@ -145,7 +172,7 @@ def cmd_status():
     n = latest()
     for i in range(max(1, n-4), n+1):
         r = C.functions.getRound(i).call()
-        print(f"  #{i} {r[0]} start={r[1]/1e8:.4f} end={r[2]/1e8:.4f} ai={r[6]} outcome={r[8]} resolved={r[10]} reason={r[7][:60]}")
+        print(f"  #{i} {r[0]} start={r[1]/1e8:.4f} end={r[2]/1e8:.4f} ai={r[6]} outcome={r[8]} resolved={r[9]} reason={r[7][:60]}")
 
 
 async def main():
@@ -161,6 +188,10 @@ async def main():
                         int(sys.argv[4]) if len(sys.argv) > 4 else 180, wait=False)
     elif cmd == "resolve":
         await cmd_resolve()
+    elif cmd == "tick":
+        lock = int(sys.argv[2]) if len(sys.argv) > 2 else 600
+        res = int(sys.argv[3]) if len(sys.argv) > 3 else 780
+        await cmd_tick(lock, res)
     else:
         cmd_status()
 

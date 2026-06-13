@@ -1,30 +1,27 @@
-# Mantle Duel — Hackathon Build (deadline 2026-06-15 08:59)
+# Mantle Duel — todo
 
-## Strategy: target 20-Deployment Award (deterministic) + Best UI/UX
-Theme: Human vs AI prediction duel. Both predictions recorded on Mantle.
+## Done
+- [x] Concept approved: Mantle Duel (Human vs AI prediction duel)
+- [x] Contract MantleDuel.sol (clean head-to-head scoreboard)
+- [x] Deployed Mantle Sepolia: 0x982e310De4EF2F509a5fa246CF35e991f0E98271
+- [x] AI agent commits prediction + reasoning on-chain (verified working)
+- [x] Frontend dapp (Viktor Space), public preview deployed
+- [x] Seeded scoreboard: Humans 2 - 1 Machines (1 tie), 5 settled duels
+- [x] Live 2h round open (#7) for visitors
+- [x] keeper.py `tick` (idempotent: resolve due + keep one live round)
+- [x] README + SUBMISSION.md + X_POST.md
+- [x] Clean git repo (no secrets; wallets.json gitignored)
 
-## Tasks
-- [ ] Test Mantle Sepolia RPC connectivity (chainId 5003)
-- [ ] Generate throwaway deployer/agent wallet
-- [ ] Get testnet MNT from faucet  <-- RISK, do first
-- [ ] Write Solidity contract (MantleDuel)
-- [ ] Compile (py-solc-x)
-- [ ] Deploy to Mantle Sepolia
-- [ ] Verify on Mantle explorer (Blockscout)
-- [ ] AI agent script (off-chain LLM -> commits prediction on-chain)
-- [ ] Keeper script (create round, resolve with real price)
-- [ ] Frontend (polished, public) + wallet connect + AI reasoning + leaderboard + share card
-- [ ] Deploy frontend publicly
+## In progress / blocked
+- [ ] Verify contract on Blockscout — explorer was 503/down; RETRY
+- [ ] GitHub push — needs Nick's repo + PAT (or zip handoff)
 - [ ] Demo video >=2min
-- [ ] README + GitHub repo
-- [ ] Pitch text + X posts
-- [ ] Hand off to Nick: register + Submit BUIDL on DoraHacks
+- [ ] DoraHacks register + Submit BUIDL (Nick) — copy ready in SUBMISSION.md
+- [ ] X post (Nick) — drafts in X_POST.md
+- [ ] Production deploy (after Nick approval)
+- [ ] Maybe keeper cron to keep live rounds fresh during judging
 
-## Deployment requirement checklist (20-Deployment Award)
-- [ ] Contract deployed on Mantle Mainnet/Testnet
-- [ ] Contract verified on Mantle Explorer
-- [ ] >=1 AI-powered function callable on-chain
-- [ ] Frontend publicly accessible (not localhost)
-- [ ] Deployment address in DoraHacks submission
-- [ ] Demo video >=2 min
-- [ ] Open-source GitHub repo w/ README
+## Notes
+- Wallets in wallets.json (throwaway). deployer funded by Nick (2 MNT).
+- Use UV_PROJECT_ENVIRONMENT=.venv for python scripts.
+- Frontend: ethers v6 loaded at runtime from esm.sh (node_modules read-only).
