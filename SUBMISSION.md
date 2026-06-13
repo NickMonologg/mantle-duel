@@ -38,7 +38,7 @@ https://explorer.sepolia.mantle.xyz/address/0x982e310De4EF2F509a5fa246CF35e991f0
 https://preview-mantle-duel-b87e2e30.viktor.space
 
 ## GitHub
-<TO ADD — Nick's repo URL>
+https://github.com/NickMonologg/mantle-duel
 
 ## Demo video
 <TO ADD>

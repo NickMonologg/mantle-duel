@@ -130,6 +130,7 @@ frontend/                    # React + Vite Viktor Space dapp
 ## Links
 
 - **Live dapp:** https://preview-mantle-duel-b87e2e30.viktor.space
+- **GitHub:** https://github.com/NickMonologg/mantle-duel
 - **Contract on explorer:** https://explorer.sepolia.mantle.xyz/address/0x982e310De4EF2F509a5fa246CF35e991f0E98271
 
 _Humans vs Machines. May the best predictor win._ ⚔️
