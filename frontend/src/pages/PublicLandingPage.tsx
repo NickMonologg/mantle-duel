@@ -86,26 +86,34 @@ export function PublicLandingPage() {
   };
 
   const loadAll = useCallback(async (addr: string | null) => {
+    // Scoreboard and rounds are loaded independently so a hiccup in one
+    // never blanks the other.
+    let rs: typeof rounds = [];
     try {
-      const [sb, rs] = await Promise.all([fetchScoreboard(), fetchRounds(8)]);
-      setScore(sb);
+      setScore(await fetchScoreboard());
+    } catch (e) {
+      console.error("scoreboard", e);
+    }
+    try {
+      rs = await fetchRounds(8);
       setRounds(rs);
-      if (addr) {
-        const [st] = await Promise.all([fetchStat(addr)]);
-        setStat(st);
+    } catch (e) {
+      console.error("rounds", e);
+    }
+    if (addr) {
+      try {
+        setStat(await fetchStat(addr));
         const preds: Record<number, number> = {};
         const setl: Record<number, boolean> = {};
-        await Promise.all(
-          rs.map(async (r) => {
-            preds[r.id] = await fetchUserPrediction(r.id, addr);
-            if (r.resolved) setl[r.id] = await fetchSettled(r.id, addr);
-          }),
-        );
+        for (const r of rs) {
+          preds[r.id] = await fetchUserPrediction(r.id, addr);
+          if (r.resolved) setl[r.id] = await fetchSettled(r.id, addr);
+        }
         setMyPred(preds);
         setMySettled(setl);
+      } catch (e) {
+        console.error("user state", e);
       }
-    } catch (e) {
-      console.error(e);
     }
   }, []);
 

@@ -67,15 +67,38 @@ export function dirLabel(d: number): "UP" | "DOWN" | "—" {
   return d === 1 ? "UP" : d === 2 ? "DOWN" : "—";
 }
 
+let _contract: any = null;
 export async function getReadContract() {
+  if (_contract) return _contract;
   const e = await getEthers();
-  const provider = new e.JsonRpcProvider(RPC, CHAIN_ID, { staticNetwork: true });
-  return new e.Contract(CONTRACT, ABI, provider);
+  // batchMaxCount:1 -> one HTTP request per call. The public Mantle RPC throttles
+  // JSON-RPC batches / parallel calls and intermittently returns empty data, which
+  // ethers reads as a revert. One-at-a-time + retry makes reads reliable.
+  const provider = new e.JsonRpcProvider(RPC, CHAIN_ID, {
+    staticNetwork: true,
+    batchMaxCount: 1,
+  });
+  _contract = new e.Contract(CONTRACT, ABI, provider);
+  return _contract;
+}
+
+async function withRetry<T = any>(fn: () => Promise<T>, tries = 4, delay = 350): Promise<T> {
+  let last: unknown;
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      last = e;
+      await new Promise((r) => setTimeout(r, delay * (i + 1)));
+    }
+  }
+  throw last;
 }
 
 export async function fetchScoreboard(): Promise<Scoreboard> {
   const c = await getReadContract();
-  const [h, a, t] = await c.scoreboard();
+  const sb: any = await withRetry(() => c.scoreboard());
+  const [h, a, t] = sb;
   return { human: toNum(h), ai: toNum(a), ties: toNum(t) };
 }
 
@@ -99,10 +122,15 @@ function parseRound(id: number, r: any): Round {
 
 export async function fetchRounds(limit = 8): Promise<Round[]> {
   const c = await getReadContract();
-  const count = toNum(await c.roundCount());
+  const count = toNum(await withRetry(() => c.roundCount()));
   const ids: number[] = [];
   for (let i = count; i >= 1 && ids.length < limit; i--) ids.push(i);
-  const rounds = await Promise.all(ids.map(async (id) => parseRound(id, await c.getRound(id))));
+  // Sequential (not Promise.all): the public RPC throttles parallel calls.
+  const rounds: Round[] = [];
+  for (const id of ids) {
+    const r = await withRetry(() => c.getRound(id));
+    rounds.push(parseRound(id, r));
+  }
   return rounds;
 }
 

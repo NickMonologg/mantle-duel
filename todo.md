@@ -14,7 +14,7 @@
 
 ## In progress / blocked
 - [ ] Verify contract on Blockscout — explorer was 503/down; RETRY
-- [ ] GitHub push — needs Nick's repo + PAT (or zip handoff)
+- [x] GitHub push DONE: https://github.com/NickMonologg/mantle-duel (full tree)
 - [ ] Demo video >=2min
 - [ ] DoraHacks register + Submit BUIDL (Nick) — copy ready in SUBMISSION.md
 - [ ] X post (Nick) — drafts in X_POST.md
